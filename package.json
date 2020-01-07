@@ -1,0 +1,26 @@
+{
+  "name": "node_shop",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PoghosyanM/shop-with-nodejs_mysql.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PoghosyanM/nodeJS-MySQL/issues"
+  },
+  "homepage": "https://github.com/PoghosyanM/nodeJS-MySQL#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "nodemon": "^2.0.2",
+    "mysql": "^2.17.0",
+    "pug": "^2.0.4"
+  }
+}
