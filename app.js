@@ -37,12 +37,10 @@ app.get('/', function (req, res) {
     'SELECT * FROM goods',
     function (error, result) {
       if (error) throw error;
-      console.log(result);
       const goods = {}
       for (let i = 0; i < result.length; i++) {
         goods[result[i]["id"]] = result[i]
       }
-      console.log(goods)
       res.render('main', {
         foo: 'hello',
         bar: 7,
@@ -54,9 +52,9 @@ app.get('/', function (req, res) {
 
 
 app.get('/cat', function (req, res) {
-  console.log(req.query.id)
-  res.render('cat', {});
+  // res.render('cat', { foo: 5 });
   const catId = req.query.id
+  console.log('req.query.id', req.query.id)
   const cat = new Promise((resolve, reject) => {
     con.query(
       'SELECT * FROM category WHERE id=' + catId,
@@ -78,7 +76,12 @@ app.get('/cat', function (req, res) {
   })
 
   Promise.all([cat, goods]).then(value => {
-    console.log(value)
+    console.log('------------------', value[0])
+    console.log('++++++++++++++++++', value[1])
+    res.render('cat', {
+      cat: JSON.parse(JSON.stringify(value[0])),
+      goods: JSON.parse(JSON.stringify(value[1]))
+    });
   })
 
 })

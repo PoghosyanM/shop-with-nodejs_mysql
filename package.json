@@ -19,8 +19,9 @@
   "homepage": "https://github.com/PoghosyanM/nodeJS-MySQL#readme",
   "dependencies": {
     "express": "^4.17.1",
-    "nodemon": "^2.0.2",
+    "mustard-ui": "0.0.8",
     "mysql": "^2.17.0",
+    "nodemon": "^2.0.2",
     "pug": "^2.0.4"
   }
 }
