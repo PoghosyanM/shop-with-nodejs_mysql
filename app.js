@@ -1,5 +1,6 @@
 let express = require('express');
 let app = express();
+const helper = require("./helper")
 /**
  * public - имя папки где хранится статика
  */
@@ -23,6 +24,7 @@ let con = mysql.createPool({
   database: 'market'
 });
 
+const converter = helper.converter
 // con.connect(function(err) {
 //   if (err) throw err;
 //   console.log("Connected!");
@@ -44,7 +46,7 @@ app.get('/', function (req, res) {
       res.render('main', {
         foo: 'hello',
         bar: 7,
-        goods: JSON.parse(JSON.stringify(goods))
+        goods: converter(goods)
       });
     }
   );
@@ -54,7 +56,6 @@ app.get('/', function (req, res) {
 app.get('/cat', function (req, res) {
   // res.render('cat', { foo: 5 });
   const catId = req.query.id
-  console.log('req.query.id', req.query.id)
   const cat = new Promise((resolve, reject) => {
     con.query(
       'SELECT * FROM category WHERE id=' + catId,
@@ -76,12 +77,33 @@ app.get('/cat', function (req, res) {
   })
 
   Promise.all([cat, goods]).then(value => {
-    console.log('------------------', value[0])
-    console.log('++++++++++++++++++', value[1])
     res.render('cat', {
-      cat: JSON.parse(JSON.stringify(value[0])),
-      goods: JSON.parse(JSON.stringify(value[1]))
+      cat: converter(value[0]),
+      goods: converter(value[1])
     });
   })
 
+})
+
+app.get('/goods', function (req, res) {
+  const catId = req.query.id
+  con.query(
+    'SELECT * FROM goods WHERE id=' + catId,
+    function (error, result) {
+      if (error) throw error
+      res.render("goods", { goods: converter(result[0]) })
+    }
+  )
+})
+
+app.post('/get-category-list', function (req, res) {
+  console.log('11111', 11111)
+  con.query(
+    'SELECT id,category FROM category',
+    function (error, result) {
+      if (error) throw error
+      console.log('result', result)
+      res.json(result)
+    }
+  )
 })
