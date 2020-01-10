@@ -13,10 +13,11 @@ app.set('view engine', 'pug');
 * Подключаем mysql модуль
 */
 let mysql = require('mysql');
+// post zaprosi body-n karuma karda u veradardzni vorpes JSON (req.body.---someThing---)
+app.use(express.json())
 /**
 * настраиваем модуль
 */
-
 let con = mysql.createPool({
   host: 'localhost',
   user: 'root',
@@ -25,36 +26,42 @@ let con = mysql.createPool({
 });
 
 const converter = helper.converter
-// con.connect(function(err) {
-//   if (err) throw err;
-//   console.log("Connected!");
-// });
 
 app.listen(3000, function () {
   console.log('node express work on 3000');
 });
 
 app.get('/', function (req, res) {
-  con.query(
-    'SELECT * FROM goods',
-    function (error, result) {
-      if (error) throw error;
-      const goods = {}
-      for (let i = 0; i < result.length; i++) {
-        goods[result[i]["id"]] = result[i]
+  let cat = new Promise(function (resolve, reject) {
+    con.query(
+      `select id,name, cost, image, category from (select id,name,cost,image,category, if(if(@curr_category != category, @curr_category :=
+      category, '') != '', @k := 0, @k := @k + 1) as ind   from goods, ( select @curr_category := '' ) v ) goods where ind < 3`,
+      function (error, result, field) {
+        if (error) return reject(error);
+        resolve(result);
       }
-      res.render('main', {
-        foo: 'hello',
-        bar: 7,
-        goods: converter(goods)
-      });
-    }
-  );
+    );
+  });
+  let catDescription = new Promise(function (resolve, reject) {
+    con.query(
+      "SELECT * FROM category",
+      function (error, result, field) {
+        if (error) return reject(error);
+        resolve(result);
+      }
+    );
+  });
+  Promise.all([cat, catDescription]).then(function (value) {
+    console.log(value[1]);
+    res.render('index', {
+      goods: JSON.parse(JSON.stringify(value[0])),
+      cat: JSON.parse(JSON.stringify(value[1])),
+    });
+  });
 });
 
 
 app.get('/cat', function (req, res) {
-  // res.render('cat', { foo: 5 });
   const catId = req.query.id
   const cat = new Promise((resolve, reject) => {
     con.query(
@@ -97,13 +104,49 @@ app.get('/goods', function (req, res) {
 })
 
 app.post('/get-category-list', function (req, res) {
-  console.log('11111', 11111)
   con.query(
     'SELECT id,category FROM category',
     function (error, result) {
       if (error) throw error
-      console.log('result', result)
       res.json(result)
     }
   )
 })
+
+app.post('/get-goods-info', function (req, res) {
+  const key = req.body.key.join(',')
+  if (!req.body.key.length) return res.send('0')
+  con.query(
+    `SELECT id,name,cost FROM goods WHERE id IN(${key})`,
+    function (error, result) {
+      if (error) throw error
+      let goods = {}
+      for (let i = 0; i < result.length; i++) {
+        goods[result[i]['id']] = result[i]
+      }
+      res.json(goods)
+    }
+  )
+})
+
+app.post('/finish-order', function (req, res) {
+  console.log(req.body);
+  if (req.body.key.length != 0) {
+    let key = Object.keys(req.body.key);
+    con.query(
+      'SELECT id,name,cost FROM goods WHERE id IN (' + key.join(',') + ')',
+      function (error, result, fields) {
+        if (error) throw error;
+        console.log(result);
+        sendMail(req.body, result).catch(console.error);
+        res.send('1');
+      });
+  }
+  else {
+    res.send('0');
+  }
+});
+
+function sendMail(data, result) {
+
+}

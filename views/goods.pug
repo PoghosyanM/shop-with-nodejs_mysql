@@ -3,7 +3,7 @@ include header
 div(class="wrap")
     div(class="content")
         header(class="site-header")
-            include siteHeader
+            include site_header
         
         div(class="container")
             div(class="row")
@@ -20,7 +20,7 @@ div(class="wrap")
                     span(class="success") Price: #{(goods['cost'] * 8).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&.')} AMD 
                     div
                         button(
-                            class="button-success add-to-card"
+                            class="button-success add-to-cart"
                             data-goods_id=goods['id']
                         ) To Cart
         include nav
