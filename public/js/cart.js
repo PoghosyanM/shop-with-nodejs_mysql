@@ -33,7 +33,6 @@ function ajaxGetGoodsInfo() {
             return resp.text()
         })
         .then(body => {
-            console.log('body', body)
             showCart(JSON.parse(body));
         })
 }
