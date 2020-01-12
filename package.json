@@ -21,6 +21,7 @@
     "express": "^4.17.1",
     "mustard-ui": "0.0.8",
     "mysql": "^2.17.0",
+    "nodemailer": "^6.4.2",
     "nodemon": "^2.0.2",
     "pug": "^2.0.4"
   }
